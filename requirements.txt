@@ -5,3 +5,4 @@ Pillow==10.2.0
 psycopg2==2.9.9
 Requests==2.31.0
 gunicorn==21.2.0
+tensorflow
