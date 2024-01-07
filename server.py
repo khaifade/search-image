@@ -22,22 +22,22 @@ SELECT_QUERY = "SELECT feature_vector, product_id FROM features;"
 url = "postgres://oedhpqsz:JkxLZcGqBUV7mwYfiRu8AXQO7sWCW7rm@floppy.db.elephantsql.com/oedhpqsz"
 connection = psycopg2.connect(url)
 
-features = []
-product_ids = []
+# features = []
+# product_ids = []
 
-with connection:
-    with connection.cursor() as cursor:
-        cursor.execute(CREATE_TABLE)
-        cursor.execute(SELECT_QUERY)
-        results = cursor.fetchall()
+# with connection:
+#     with connection.cursor() as cursor:
+#         cursor.execute(CREATE_TABLE)
+#         cursor.execute(SELECT_QUERY)
+#         results = cursor.fetchall()
 
-        for result in results:
-            feature_vector = result[0]
-            product_id = result[1]
-            feature_vector_np = np.array(feature_vector)
+#         for result in results:
+#             feature_vector = result[0]
+#             product_id = result[1]
+#             feature_vector_np = np.array(feature_vector)
 
-            features.append(feature_vector_np)
-            product_ids.append(product_id)
+#             features.append(feature_vector_np)
+#             product_ids.append(product_id)
 
 fe = FeatureExtractor()
 
@@ -62,6 +62,22 @@ def create():
 
 @app.route('/api/search', methods=['GET', 'POST'])
 def index():
+    features = []
+    product_ids = []
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(CREATE_TABLE)
+            cursor.execute(SELECT_QUERY)
+            results = cursor.fetchall()
+
+            for result in results:
+                feature_vector = result[0]
+                product_id = result[1]
+                feature_vector_np = np.array(feature_vector)
+
+                features.append(feature_vector_np)
+                product_ids.append(product_id)
     if request.method == 'POST':
         file = request.files['file']
         img = Image.open(file.stream)  # PIL image

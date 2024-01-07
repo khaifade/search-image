@@ -4,5 +4,3 @@ numpy
 Pillow
 psycopg2
 Requests
-gunicorn
-tensorflow
