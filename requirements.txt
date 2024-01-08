@@ -6,3 +6,4 @@ Pillow
 psycopg2
 Requests
 gunicorn
+flask_cors
