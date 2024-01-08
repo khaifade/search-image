@@ -5,8 +5,9 @@ from flask import Flask, request, jsonify
 import psycopg2
 import requests
 from io import BytesIO
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 CREATE_TABLE = """
 CREATE TABLE IF NOT EXISTS features (
@@ -22,22 +23,22 @@ SELECT_QUERY = "SELECT feature_vector, product_id FROM features;"
 url = "postgres://oedhpqsz:JkxLZcGqBUV7mwYfiRu8AXQO7sWCW7rm@floppy.db.elephantsql.com/oedhpqsz"
 connection = psycopg2.connect(url)
 
-# features = []
-# product_ids = []
+features = []
+product_ids = []
 
-# with connection:
-#     with connection.cursor() as cursor:
-#         cursor.execute(CREATE_TABLE)
-#         cursor.execute(SELECT_QUERY)
-#         results = cursor.fetchall()
+with connection:
+    with connection.cursor() as cursor:
+        cursor.execute(CREATE_TABLE)
+        cursor.execute(SELECT_QUERY)
+        results = cursor.fetchall()
 
-#         for result in results:
-#             feature_vector = result[0]
-#             product_id = result[1]
-#             feature_vector_np = np.array(feature_vector)
+        for result in results:
+            feature_vector = result[0]
+            product_id = result[1]
+            feature_vector_np = np.array(feature_vector)
 
-#             features.append(feature_vector_np)
-#             product_ids.append(product_id)
+            features.append(feature_vector_np)
+            product_ids.append(product_id)
 
 fe = FeatureExtractor()
 
@@ -86,7 +87,9 @@ def index():
         dists = np.linalg.norm(features - query, axis=1)  # L2 distances to features
         ids = np.argsort(dists)[:30]  # Top 30 results
         product_ids_res = [str(product_ids[id]) for id in ids]
-        return jsonify({'product_ids': product_ids_res})
+        response = jsonify({'product_ids': product_ids_res})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0")
